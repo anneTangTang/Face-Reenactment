@@ -1,4 +1,5 @@
 ## 一键实现人物A驱动人物B
+- download BFM.mat to face3d/utils/Data/ , link:
 - install `ffmpeg` first
 - 根据自己电脑的`cuda`和`driver`版本安装相应版本的`pytorch`和`torchvision`
 - 直接运行`sh pipeline.sh [source_video] [target_video]`，即可运行全流程的代码
