@@ -1,27 +1,25 @@
+#!/usr/bin/env python3
+# Author: AnniTang
+
 """
-functions about rendering mesh(from 3d obj to 2d image).
-only use rasterization render here.
+Functions about rendering mesh(from 3d obj to 2d image),
+using rasterization render here.
 Note that:
-1. Generally, render func includes camera, light, raterize. Here no camera and light(I write these in other files)
-2. Generally, the input vertices are normalized to [-1,1] and cetered on [0, 0]. (in world space)
-   Here, the vertices are using image coords, which centers on [w/2, h/2] with the y-axis pointing to oppisite direction.
+1. Generally, render func includes camera, light, raterize. Here no camera and light.
+2. Generally, the input vertices are normalized to [-1,1] and centered on [0, 0]. (in world space)
+   Here, the vertices are using image coords, which centers on [w/2, h/2] with the y-axis pointing to opposite direction.
 Means: render here only conducts interpolation.(I just want to make the input flexible)
 
 Preparation knowledge:
 z-buffer: https://cs184.eecs.berkeley.edu/lecture/pipeline
-
-Author: Anni Tang
-Mail: 1029216465@sjtu.edu.cn
 """
 
-from __future__ import absolute_import, division, print_function
-
-from typing import Any, Sequence, Tuple
+from typing import Sequence, Tuple
 
 import numpy as np
 
 
-def is_point_in_tri(point: Sequence[int], tri_points: Any) -> bool:
+def is_point_in_tri(point: Sequence[int], tri_points: np.ndarray) -> bool:
     """ Judge whether a point is in a triangle.
     Method: http://blackpawn.com/texts/pointinpoly/
 
@@ -29,7 +27,6 @@ def is_point_in_tri(point: Sequence[int], tri_points: Any) -> bool:
     :param tri_points: (3 vertices, 2 coordinates). three vertices(2d points) of a triangle.
     :return: whether the point is in the triangle
     """
-    # vectors
     v0 = tri_points[2, :] - tri_points[0, :]
     v1 = tri_points[1, :] - tri_points[0, :]
     v2 = point - tri_points[0, :]
@@ -48,7 +45,7 @@ def is_point_in_tri(point: Sequence[int], tri_points: Any) -> bool:
     return (u >= 0) & (v >= 0) & (u + v < 1)
 
 
-def get_point_weight(point: Sequence[int], tri_points: Any) -> Tuple[float, float, float]:
+def get_point_weight(point: Sequence[int], tri_points: np.ndarray) -> Tuple[float, float, float]:
     """ Get the weights of the point.
     Methods: https://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycen_tric-coordinates
      -m1.compute the area of the triangles formed by embedding the point P inside the triangle
@@ -78,8 +75,8 @@ def get_point_weight(point: Sequence[int], tri_points: Any) -> Tuple[float, floa
 
 
 def rasterize_triangles(
-    vertices: Any, triangles: Any, h: int, w: int
-) -> Tuple[Any, Any, Any]:
+    vertices: np.ndarray, triangles: np.ndarray, h: int, w: int
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Rasterize triangles.
     Each triangle has 3 vertices & Each vertex has 3 coordinates x, y, z.
     h, w is the size of rendering
@@ -126,34 +123,7 @@ def rasterize_triangles(
     return depth_buffer, triangle_buffer, barycen_tric_weight
 
 
-def render_colors_ras(
-    vertices: Any, triangles: Any, colors: Any, h: int, w: int
-) -> Any:
-    """Render mesh with colors (rasterize triangle first)
-
-    :param vertices: (n_ver, 3)
-    :param triangles: (n_tri, 3)
-    :param colors: (n_ver, 3)
-    :param h: the height of the rendering image
-    :param w: the width of the rendering image
-    :return: (h, w, 3). rendering image.
-    """
-    assert vertices.shape[0] == colors.shape[0], "Vertices and colors should have the same shape!"
-
-    _, triangle_buffer, barycen_tric_weight = rasterize_triangles(vertices, triangles, h, w)
-
-    triangle_buffer_flat = np.reshape(triangle_buffer, [-1])  # (h*w,)
-    barycen_tric_weight_flat = np.reshape(barycen_tric_weight, [-1, 3])  # (h*w, 3)
-    weight = barycen_tric_weight_flat[:, :, np.newaxis]  # (h*w, 3(ver in tri), 1)
-    colors_flat = colors[
-        triangles[triangle_buffer_flat, :], :
-    ]  # (h*w(tri id in pixel), 3(ver in tri), 3(color in ver))
-    colors_flat = weight * colors_flat  # (h*w, 3, 3)
-    colors_flat = np.sum(colors_flat, 1)  # (h*w, 3). add tri.
-    return np.reshape(colors_flat, [h, w, 3])
-
-
-def render_mask(vertices: Any, triangles, weights: Any, h: int, w: int) -> Any:
+def render_mask(vertices: np.ndarray, triangles: np.ndarray, weights: np.ndarray, h: int, w: int) -> np.ndarray:
     """Render a mask image with different weights in each pixel.
 
     :param vertices: (n_ver, 3)
@@ -196,8 +166,8 @@ def render_mask(vertices: Any, triangles, weights: Any, h: int, w: int) -> Any:
 
 
 def render_colors(
-    vertices: Any, triangles: Any, colors: Any, h: int, w: int
-) -> Any:
+    vertices: np.ndarray, triangles: np.ndarray, colors: np.ndarray, h: int, w: int
+) -> np.ndarray:
     """ Render mesh with colors.
 
     :param vertices: (n_ver, 3)
@@ -237,3 +207,30 @@ def render_colors(
                         w0 * colors[tri[0], :] + w1 * colors[tri[1], :] + w2 * colors[tri[2], :]
                     )
     return image
+
+
+def render_colors_ras(
+    vertices: np.ndarray, triangles: np.ndarray, colors: np.ndarray, h: int, w: int
+) -> np.ndarray:
+    """Render mesh with colors (rasterize triangle first)
+
+    :param vertices: (n_ver, 3)
+    :param triangles: (n_tri, 3)
+    :param colors: (n_ver, 3)
+    :param h: the height of the rendering image
+    :param w: the width of the rendering image
+    :return: (h, w, 3). rendering image.
+    """
+    assert vertices.shape[0] == colors.shape[0], "Vertices and colors should have the same shape!"
+
+    _, triangle_buffer, barycen_tric_weight = rasterize_triangles(vertices, triangles, h, w)
+
+    triangle_buffer_flat = np.reshape(triangle_buffer, [-1])  # (h*w,)
+    barycen_tric_weight_flat = np.reshape(barycen_tric_weight, [-1, 3])  # (h*w, 3)
+    weight = barycen_tric_weight_flat[:, :, np.newaxis]  # (h*w, 3(ver in tri), 1)
+    colors_flat = colors[
+        triangles[triangle_buffer_flat, :], :
+    ]  # (h*w(tri id in pixel), 3(ver in tri), 3(color in ver))
+    colors_flat = weight * colors_flat  # (h*w, 3, 3)
+    colors_flat = np.sum(colors_flat, 1)  # (h*w, 3). add tri.
+    return np.reshape(colors_flat, [h, w, 3])
