@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-#
-# Copyright AnniTang.
-#
+# Author: AnniTang
+
 """In this file, we detect 68 landmarks in one face in an image.
 Usage: python predictor.py --input [folder_name] --save [save_json]
 """

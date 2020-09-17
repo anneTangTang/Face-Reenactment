@@ -1,17 +1,22 @@
+#!/usr/bin/env python3
+# Author: AnniTang
+
 """Use openCV to detect faces in an image."""
 
 import argparse
 from configparser import ConfigParser
 
 import cv2
+import numpy as np
+from typing import Tuple
 
 
 class FaceDetector:
-    def __init__(self, face_cascade_path):
+    def __init__(self, face_cascade_path: str) -> None:
         # load the face detector
         self.face_cascade = cv2.CascadeClassifier(face_cascade_path)
 
-    def detect(self, image):
+    def detect(self, image: np.ndarray) -> Tuple[int, int, int, int]:
         faces = self.face_cascade.detectMultiScale(image)
         # if len(faces) > 1:
         #     raise RuntimeError("Detect multiple faces in the input video!")
@@ -23,7 +28,6 @@ class FaceDetector:
             y = max(y - h // 3, 0)
             w = min(int(w * 1.7), img_w - 1 - x)
             h = min(int(h * 1.7), img_h - 1 - y)
-            # image = cv2.rectangle(image, (x, y), (x + int(w), y + int(h)), color=(255, 0, 255))
             return x, y, min(w, h), min(w, h)
 
 

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-#
-# Copyright AnniTang.
-#
+# Author: AnniTang
+
 """In this file, we write 68 landmarks in one face into a json file.
 Usage: python predictor.py --input [drived_json] --save [save_json]
 """
