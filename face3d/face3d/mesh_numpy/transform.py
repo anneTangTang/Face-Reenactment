@@ -7,9 +7,6 @@ Preparation knowledge:
 transform&camera model: https://cs184.eecs.berkeley.edu/lecture/transforms-2
 Part I: camera geometry and single view geometry in MVGCV
 """
-
-from __future__ import absolute_import, division, print_function
-
 import math
 from math import cos, sin
 from typing import Any, Sequence
@@ -98,9 +95,9 @@ def lookat_camera(vertices, eye, at=None, up=None):
     Returns:
       transformed_vertices: [nver, 3]
     """
-    if at is None:
+    if not at:
         at = np.array([0, 0, 0], np.float32)
-    if up is None:
+    if not up:
         up = np.array([0, 1, 0], np.float32)
 
     eye = np.array(eye).astype(np.float32)
@@ -111,8 +108,7 @@ def lookat_camera(vertices, eye, at=None, up=None):
 
     R = np.stack((x_aixs, y_axis, z_aixs))  # , axis = 0) # 3 x 3
     transformed_vertices = vertices - eye  # translation
-    transformed_vertices = transformed_vertices.dot(R.T)  # rotation
-    return transformed_vertices
+    return transformed_vertices.dot(R.T)
 
 
 # 3d->2d project. from camera space to image plane
