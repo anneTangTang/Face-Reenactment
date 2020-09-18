@@ -1,6 +1,5 @@
-"""
-Estimating parameters about vertices: shape para, exp para, pose para(s, R, t)
-"""
+"""This class defines some functions to estimate parameters of 3d morphable model."""
+
 from typing import Any, Sequence, Tuple
 
 import numpy as np
@@ -9,52 +8,11 @@ from .. import mesh_numpy
 from .morphabel_model import MorphabelModel
 
 
-""" TODO: a clear document. 
-Given: image_points, 3D Model
-Estimate: shape, expression, pose
-
-Inference: 
-
-    projected_vertices = s*P*R(mu + shape + exp) + t2d  --> image_points
-    s*P*R*shape + s*P*R(mu + exp) + t2d --> image_points
-
-    # Define:
-    X = vertices
-    x_hat = projected_vertices
-    x = image_points
-    A = s*P*R
-    b = s*P*R(mu + exp) + t2d
-    ==>
-    x_hat = A*shape + b  (2 x n)
-
-    A*shape (2 x n)
-    shape = reshape(shape_pc * sp) (3 x n)
-    shape_pc*sp : (3n x 1)
-
-    * flatten:
-    x_hat_flatten = A*shape + b_flatten  (2n x 1)
-    A*shape (2n x 1)
-    --> A*shape_pc (2n x 199)  sp: 199 x 1
-    
-    # Define:
-    pc_2d = A* reshape(shape_pc)
-    pc_2d_flatten = flatten(pc_2d) (2n x 199)
-
-    =====>
-    x_hat_flatten = pc_2d_flatten * sp + b_flatten ---> x_flatten (2n x 1)
-
-    Goals:
-    (ignore flatten, pc_2d-->pc)
-    min E = || x_hat - x || + lambda*sum(sp/sigma)^2
-          = || pc * sp + b - x || + lambda*sum(sp/sigma)^2
-
-    Solve:
-    d(E)/d(sp) = 0
-    2 * pc' * (pc * sp + b - x) + 2 * lambda * sp / (sigma' * sigma) = 0
-
-    Get:
-    (pc' * pc + lambda / (sigma'* sigma)) * sp  = pc' * (x - b)
-
+""" 
+1. Given: image_points, 3D Model
+   Estimate: shape, expression, pose
+2. Given: pixel_value, 3D Model
+   Estimate: texture, light
 """
 
 
