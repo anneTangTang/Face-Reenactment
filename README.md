@@ -1,6 +1,6 @@
-## Full Head Sythesis
+## Face Reenactment
 
-This project is mainly based on DeepVideoPortraits to implement full head synthesis.
+This project is mainly based on DeepVideoPortraits to implement face reenactment, using 3D methods.
 Follow the steps below, and you can run the project. The input consists of
 one target video and one source video, and the output is a driven video.
  
