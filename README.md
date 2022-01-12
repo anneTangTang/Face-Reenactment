@@ -4,7 +4,7 @@ This project is mainly based on DeepVideoPortraits to implement face reenactment
 Follow the steps below, and you can run the project. The input consists of
 one target video and one source video, and the output is a driven video.
  
-- Download `BFM.mat` to `face3d/utils/Data/`, link:[TODO]
+- Download [BFM.mat](https://drive.google.com/file/d/1YwTD_xbjFuXH_FJTsNFs9uf14RFdfEK6/view?usp=sharing) to `face3d/utils/Data/`
 - Install `ffmpeg`, `pytorch` and `torchvision`
 - Run `sh pipeline.sh [source_video] [target_video]` in your command line
 - The output video is saved in `drive/drive.mp4`
